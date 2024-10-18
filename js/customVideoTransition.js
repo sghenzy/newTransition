@@ -76,19 +76,30 @@ class VideoTransition {
     }
 
     initScrollEffect() {
+        // Configurazione di ScrollTrigger per gestire la transizione tra i video
+        ScrollTrigger.create({
+            trigger: "#content", // L'elemento che attiva lo scroll
+            start: "top top",    // Inizia quando la parte superiore dell'elemento è in alto
+            end: "bottom bottom",// Finisce quando la parte inferiore dell'elemento è in basso
+            scrub: true,         // Sincronizza l'animazione con lo scroll
+            markers: true        // Mostra marcatori per il debug
+        });
+    
+        // Timeline per animare il progresso della transizione tra i due video
         gsap.timeline({
             scrollTrigger: {
                 trigger: "#content",
                 start: "top top",
                 end: "bottom bottom",
-                scrub: true
+                scrub: true,
+                markers: true, // Mostra marcatori per verificare dove si attiva ScrollTrigger
             }
         })
         .to(this.material.uniforms.uProgress, {
             value: 1, // transizione completa verso il secondo video
             duration: 2
         });
-    }
+    }    
 
     animate() {
         requestAnimationFrame(this.animate.bind(this));

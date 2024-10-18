@@ -1,53 +1,50 @@
 body {
-	margin: 0;
-	color: #000;
-	background-color: #000;
-	font-family: ivymode, -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif;
-	-webkit-font-smoothing: antialiased;
-	-moz-osx-font-smoothing: grayscale;
-  }
-  
-  a {
-	text-decoration: none;
-	color: #4b4b4b;
-	outline: none;
-  }
-  
-  a:hover,
-  a:focus {
-	color: #000;
-	outline: none;
-	text-decoration: underline;
-  }
-  
-  .content {
-	display: flex;
-	width: 100vw;
-	height: 100vh;
-	position: relative;
-	justify-content: center;
-	align-items: center;
-	cursor: pointer;
-	overflow: hidden; /* Evita overflow di video */
-  }
-  
-  #slider {
-	width: 100%;
-	height: 100%;
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	z-index: -1;
-  }
+    margin: 0;
+    color: #000;
+    background-color: #000;
+    font-family: ivymode, -apple-system, BlinkMacSystemFont, Segoe UI, Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
 
-  canvas {
-	display: block;
-	width: 100vw;
-	height: 100vh;
-	position: absolute;
-	top: 0;
-	left: 0;
-	object-fit: cover; /* Mantiene il rapporto d'aspetto del video */
-  }
-  
-  
+a {
+    text-decoration: none;
+    color: #4b4b4b;
+}
+
+a:hover,
+a:focus {
+    color: #000;
+    text-decoration: underline;
+}
+
+/* Rimuoviamo 'height: 100vh' per consentire lo scroll e forziamo una maggiore altezza */
+.content {
+    display: flex;
+    width: 100vw;
+    min-height: 200vh; /* Aumenta l'altezza per consentire lo scroll */
+    position: relative;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    overflow: hidden; /* Evita overflow di video */
+}
+
+#slider {
+    width: 100%;
+    height: 100vh; /* Occupa l'altezza della finestra per il primo video */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: -1;
+}
+
+canvas {
+    display: block;
+    width: 100vw;
+    height: 100vh;
+    position: absolute;
+    top: 0;
+    left: 0;
+    object-fit: cover; /* Mantiene il rapporto d'aspetto del video */
+}
