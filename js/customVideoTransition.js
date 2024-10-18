@@ -35,33 +35,31 @@ class VideoTransition {
             `,
             fragmentShader: `
                 uniform sampler2D uTexture1;
-                uniform sampler2D uTexture2;
-                uniform float uProgress;
-                varying vec2 vUv;
+                    uniform sampler2D uTexture2;
+                    uniform float uProgress;
+                    varying vec2 vUv;
 
-                void main() {
-                    // Interpola tra due texture
-                    vec4 tex1 = texture2D(uTexture1, vUv);
-                    vec4 tex2 = texture2D(uTexture2, vUv);
-                    
-                    // Calcola la distorsione basata su uProgress
-                    float distortionAmount = sin(uProgress * 3.14159) * 0.3; // Aumenta il valore per più distorsione
-                    vec2 distortedUv = vec2(vUv.x + distortionAmount * (1.0 - vUv.x), vUv.y); // Distorce il lato destro
-                    
-                    // Effetto RGB split: separa i canali colore leggermente
-                    float rOffset = 0.01 * uProgress; // Offset rosso
-                    float gOffset = 0.02 * uProgress; // Offset verde
-                    float bOffset = 0.03 * uProgress; // Offset blu
-                    
-                    vec4 color1 = texture2D(uTexture1, distortedUv - vec2(rOffset, 0.0));
-                    vec4 color2 = texture2D(uTexture2, distortedUv + vec2(gOffset, 0.0));
-                    vec4 color3 = texture2D(uTexture2, distortedUv - vec2(bOffset, 0.0));
-                    
-                    // Mixa i canali dei due video in base al progressivo cambiamento
-                    vec4 finalColor = vec4(color1.r, color2.g, color3.b, 1.0);
-                    gl_FragColor = mix(tex1, finalColor, uProgress);
-                }
-
+                    void main() {
+                        // Distorsione attiva solo durante la transizione
+                        float distortionAmount = smoothstep(0.1, 0.9, uProgress) * 0.3; // Maggiore controllo sulla deformazione
+                        vec2 distortedUv = vUv + vec2(distortionAmount * (1.0 - vUv.x), 0.0); // Distorce verso il lato destro
+                        
+                        // Effetto RGB Split: solo quando c'è una distorsione
+                        float rOffset = 0.01 * distortionAmount; // Offset rosso
+                        float gOffset = 0.015 * distortionAmount; // Offset verde
+                        float bOffset = 0.02 * distortionAmount; // Offset blu
+                        
+                        vec4 tex1 = texture2D(uTexture1, vUv);
+                        vec4 tex2 = texture2D(uTexture2, distortedUv);
+                        
+                        vec4 color1 = texture2D(uTexture1, distortedUv - vec2(rOffset, 0.0));
+                        vec4 color2 = texture2D(uTexture2, distortedUv + vec2(gOffset, 0.0));
+                        vec4 color3 = texture2D(uTexture2, distortedUv - vec2(bOffset, 0.0));
+                        
+                        // Mixa i canali solo dove c'è distorsione
+                        vec4 finalColor = mix(tex1, vec4(color1.r, color2.g, color3.b, 1.0), smoothstep(0.1, 0.9, uProgress));
+                        gl_FragColor = finalColor;
+                    }
             `
         });
 
@@ -92,15 +90,16 @@ class VideoTransition {
     initScrollEffect() {
         ScrollTrigger.create({
             trigger: "#content",
-            start: "top top", // Inizio della transizione
-            end: "bottom top", // Fine della transizione
+            start: "top top", // Inizia all'inizio della pagina
+            end: "+=1500", // Scroll più lungo per coprire l'intera transizione
             scrub: true, // Sincronizza l'animazione con lo scroll
-            markers: true, // Mostra i marcatori per il debug
+            markers: true, // Attiva i marcatori per il debug
             onUpdate: (self) => {
                 this.material.uniforms.uProgress.value = self.progress;
             }
         });
-    }       
+    }
+           
     
     startTransition() {
         gsap.to(this.material.uniforms.uProgress, {
