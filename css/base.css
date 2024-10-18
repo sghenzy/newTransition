@@ -27,20 +27,19 @@ a:focus {
     z-index: 1;
 }
 
+.content {
+    width: 100vw;
+    min-height: 200vh; /* Permette lo scroll */
+    overflow: hidden; /* Evita overflow di video */
+}
+
 .video-container {
-    position: absolute;
+    position: fixed; /* Mantiene il video fisso durante lo scroll */
     top: 0;
     left: 0;
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
-    z-index: -1; /* Mantiene il video dietro altri contenuti */
-}
-.content {
-    overflow: hidden; /* Blocca lo scroll del contenuto */
-    position: fixed; /* Rende l'intera area fissa */
     width: 100vw;
     height: 100vh;
+    z-index: -1;
 }
 
 canvas {

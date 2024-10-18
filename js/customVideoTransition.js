@@ -76,16 +76,21 @@ class VideoTransition {
     }
 
     initScrollEffect() {
+        // Imposta un trigger per avviare la transizione quando si scrolla
         ScrollTrigger.create({
             trigger: "#content",
-            start: "top top", // Quando inizia lo scroll
-            end: "top -500px", // Fino a 500px di scroll
-            onEnter: () => this.startTransition(), // Avvia transizione
-            onLeave: () => this.reverseTransition(), // In caso serva invertire la transizione
-            scrub: false, // Cambiamento non sincronizzato con lo scroll
-            markers: true // Per debug
+            start: "top top", // Inizia appena parte la pagina
+            end: "bottom top", // Scorre fino alla fine della pagina
+            scrub: 1, // Sincronizza l'animazione con lo scroll
+            markers: true, // Per debug
+            onUpdate: (self) => {
+                // Usa il progresso dello scroll per impostare il valore di transizione
+                this.material.uniforms.uProgress.value = self.progress;
+                console.log("Scroll progress:", self.progress);
+            }
         });
     }
+    
     
     startTransition() {
         gsap.to(this.material.uniforms.uProgress, {
