@@ -10,13 +10,14 @@
 <body>
     <!-- Div principale per il contenuto -->
     <div id="content" class="content">
-        <div id="slider" data-images='["video/reel1.webm","video/reel2.webm"]'></div>
+        <!-- Contenitore video fisso per mantenere i video centrati e fermi -->
+        <div id="slider" class="video-container" data-images='["video/reel1.webm","video/reel2.webm"]'></div>
     </div>
 
     <!-- Inclusione degli script necessari -->
     <script src="js/three.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-	<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
-    <script src="js/customVideoTransition.js"></script> <!-- Nuovo script per gestire l'effetto -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <script src="js/customVideoTransition.js"></script> <!-- Script aggiornato per gestire l'effetto -->
 </body>
 </html>

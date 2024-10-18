@@ -76,30 +76,33 @@ class VideoTransition {
     }
 
     initScrollEffect() {
-        // Configurazione di ScrollTrigger per gestire la transizione tra i video
         ScrollTrigger.create({
-            trigger: "#content", // L'elemento che attiva lo scroll
-            start: "top top",    // Inizia quando la parte superiore dell'elemento è in alto
-            end: "bottom bottom",// Finisce quando la parte inferiore dell'elemento è in basso
-            scrub: true,         // Sincronizza l'animazione con lo scroll
-            markers: true        // Mostra marcatori per il debug
+            trigger: "#content",
+            start: "top top", // Quando inizia lo scroll
+            end: "top -500px", // Fino a 500px di scroll
+            onEnter: () => this.startTransition(), // Avvia transizione
+            onLeave: () => this.reverseTransition(), // In caso serva invertire la transizione
+            scrub: false, // Cambiamento non sincronizzato con lo scroll
+            markers: true // Per debug
         });
+    }
     
-        // Timeline per animare il progresso della transizione tra i due video
-        gsap.timeline({
-            scrollTrigger: {
-                trigger: "#content",
-                start: "top top",
-                end: "bottom bottom",
-                scrub: true,
-                markers: true, // Mostra marcatori per verificare dove si attiva ScrollTrigger
-            }
-        })
-        .to(this.material.uniforms.uProgress, {
-            value: 1, // transizione completa verso il secondo video
-            duration: 2
+    startTransition() {
+        gsap.to(this.material.uniforms.uProgress, {
+            value: 1, // Completa la transizione
+            duration: 1.5, // Durata dell'animazione
+            ease: "power2.inOut"
         });
-    }    
+    }
+    
+    reverseTransition() {
+        gsap.to(this.material.uniforms.uProgress, {
+            value: 0, // Torna al primo video
+            duration: 1.5,
+            ease: "power2.inOut"
+        });
+    }
+        
 
     animate() {
         requestAnimationFrame(this.animate.bind(this));

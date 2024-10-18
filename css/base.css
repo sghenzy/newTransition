@@ -18,25 +18,29 @@ a:focus {
     text-decoration: underline;
 }
 
-/* Rimuoviamo 'height: 100vh' per consentire lo scroll e forziamo una maggiore altezza */
-.content {
-    display: flex;
+#slider {
     width: 100vw;
-    min-height: 200vh; /* Aumenta l'altezza per consentire lo scroll */
-    position: relative;
+    height: 100vh;
+    display: flex;
     justify-content: center;
     align-items: center;
-    cursor: pointer;
-    overflow: hidden; /* Evita overflow di video */
+    z-index: 1;
 }
 
-#slider {
+.video-container {
+    position: absolute;
+    top: 0;
+    left: 0;
     width: 100%;
-    height: 100vh; /* Occupa l'altezza della finestra per il primo video */
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: -1;
+    height: 100%;
+    overflow: hidden;
+    z-index: -1; /* Mantiene il video dietro altri contenuti */
+}
+.content {
+    overflow: hidden; /* Blocca lo scroll del contenuto */
+    position: fixed; /* Rende l'intera area fissa */
+    width: 100vw;
+    height: 100vh;
 }
 
 canvas {
