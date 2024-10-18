@@ -29,12 +29,12 @@ a:focus {
 
 .content {
     width: 100vw;
-    min-height: 200vh; /* Permette lo scroll */
-    overflow: hidden; /* Evita overflow di video */
+    min-height: 300vh; /* Aumenta l'altezza per creare più spazio di scroll */
+    overflow: hidden;
 }
 
 .video-container {
-    position: fixed; /* Mantiene il video fisso durante lo scroll */
+    position: fixed; /* Mantiene il video fisso */
     top: 0;
     left: 0;
     width: 100vw;

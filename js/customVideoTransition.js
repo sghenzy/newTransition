@@ -76,20 +76,20 @@ class VideoTransition {
     }
 
     initScrollEffect() {
-        // Imposta un trigger per avviare la transizione quando si scrolla
         ScrollTrigger.create({
             trigger: "#content",
-            start: "top top", // Inizia appena parte la pagina
-            end: "bottom top", // Scorre fino alla fine della pagina
-            scrub: 1, // Sincronizza l'animazione con lo scroll
-            markers: true, // Per debug
+            start: "top top", // Inizia la transizione all'inizio della pagina
+            end: "bottom top", // Termina quando l'utente ha scrollato tutta la pagina
+            scrub: true, // Sincronizza l'animazione con lo scroll
+            markers: true, // Abilita i marcatori per il debug
             onUpdate: (self) => {
-                // Usa il progresso dello scroll per impostare il valore di transizione
-                this.material.uniforms.uProgress.value = self.progress;
+                // Aggiorna il progresso dello scroll per gestire la transizione tra i video
+                this.material.uniforms.uProgress.value = self.progress; 
                 console.log("Scroll progress:", self.progress);
             }
         });
     }
+    
     
     
     startTransition() {
