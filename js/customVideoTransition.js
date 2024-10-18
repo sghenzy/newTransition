@@ -91,7 +91,7 @@ class VideoTransition {
         ScrollTrigger.create({
             trigger: "#content",
             start: "top top", // Inizia all'inizio della pagina
-            end: "+=1500", // Scroll più lungo per coprire l'intera transizione
+            end: "+=2500", // Scroll più lungo per coprire l'intera transizione
             scrub: true, // Sincronizza l'animazione con lo scroll
             markers: true, // Attiva i marcatori per il debug
             onUpdate: (self) => {
