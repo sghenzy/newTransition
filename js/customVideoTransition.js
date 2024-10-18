@@ -119,31 +119,36 @@ class VideoTransition {
     }
 
     setupTweakpane() {
-        const pane = new Tweakpane();
-        const folder = pane.addFolder({ title: "Video Transition Settings" });
-
-        // Slider per modificare i parametri di distorsione e RGB split
-        folder.addInput(this.material.uniforms.uDistortion, "value", {
-            min: 0,
-            max: 0.3,
-            step: 0.01,
-            label: "Distortion"
-        });
-
-        folder.addInput(this.material.uniforms.uRGBSplit, "value", {
-            min: 0,
-            max: 0.05,
-            step: 0.001,
-            label: "RGB Split"
-        });
-
-        folder.addInput(this.material.uniforms.uProgress, "value", {
-            min: 0,
-            max: 1,
-            step: 0.01,
-            label: "Progress"
-        });
+        try {
+            const pane = new Tweakpane(); // Verifica che Tweakpane sia stato caricato correttamente
+    
+            const folder = pane.addFolder({ title: "Video Transition Settings" });
+    
+            folder.addInput(this.material.uniforms.uDistortion, "value", {
+                min: 0,
+                max: 0.3,
+                step: 0.01,
+                label: "Distortion"
+            });
+    
+            folder.addInput(this.material.uniforms.uRGBSplit, "value", {
+                min: 0,
+                max: 0.05,
+                step: 0.001,
+                label: "RGB Split"
+            });
+    
+            folder.addInput(this.material.uniforms.uProgress, "value", {
+                min: 0,
+                max: 1,
+                step: 0.01,
+                label: "Progress"
+            });
+        } catch (error) {
+            console.error("Errore durante l'inizializzazione di Tweakpane:", error);
+        }
     }
+    
 
     animate() {
         requestAnimationFrame(this.animate.bind(this));
