@@ -29,7 +29,7 @@ a:focus {
 
 .content {
     width: 100vw;
-    min-height: 300vh; /* Aumenta l'altezza per creare più spazio di scroll */
+    min-height: 500vh; /* Aumenta l'altezza per creare più spazio di scroll */
     overflow: hidden;
 }
 
