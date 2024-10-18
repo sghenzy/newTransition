@@ -90,20 +90,16 @@ class VideoTransition {
     initScrollEffect() {
         ScrollTrigger.create({
             trigger: "#content",
-            start: "top top", // Inizia all'inizio della pagina
-            end: "+=2500", // Scroll più lungo per coprire l'intera transizione
-            scrub: true, // Sincronizza l'animazione con lo scroll
-            markers: true, // Attiva i marcatori per il debug
-            onUpdate: (self) => {
-                this.material.uniforms.uProgress.value = self.progress;
-            }
+            start: "top top", // Attiva lo scroll all'inizio della pagina
+            onEnter: () => this.startTransition(), // Avvia la transizione una volta che lo scroll è attivato
+            onLeaveBack: () => this.reverseTransition(), // Torna indietro se necessario
+            markers: true // Usa i marcatori per il debug
         });
     }
-           
     
     startTransition() {
         gsap.to(this.material.uniforms.uProgress, {
-            value: 1, // Completa la transizione
+            value: 1, // Completa la transizione verso il secondo video
             duration: 1.5, // Durata dell'animazione
             ease: "power2.inOut"
         });
@@ -111,12 +107,11 @@ class VideoTransition {
     
     reverseTransition() {
         gsap.to(this.material.uniforms.uProgress, {
-            value: 0, // Torna al primo video
+            value: 0, // Torna indietro al primo video
             duration: 1.5,
             ease: "power2.inOut"
         });
-    }
-        
+    }       
 
     animate() {
         requestAnimationFrame(this.animate.bind(this));
