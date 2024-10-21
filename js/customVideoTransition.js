@@ -18,12 +18,12 @@ class VideoTransition {
         const videoPaths = JSON.parse(this.container.dataset.images);
         this.videoTextures = await Promise.all(videoPaths.map(this.loadVideoTexture));
 
-        // Creazione del materiale shader per gli effetti
+        // Creazione del materiale shader per l'interpolazione
         this.material = new THREE.ShaderMaterial({
             uniforms: {
                 uTexture1: { value: this.videoTextures[0] },
                 uTexture2: { value: this.videoTextures[1] },
-                uProgress: { value: 0.0 }, // Stato di interpolazione tra i video
+                uProgress: { value: 0.0 }, // Valore di transizione
                 uResolution: { value: new THREE.Vector2(window.innerWidth, window.innerHeight) }
             },
             vertexShader: `
@@ -40,7 +40,7 @@ class VideoTransition {
                 varying vec2 vUv;
 
                 void main() {
-                    // Interpolazione tra due video
+                    // Interpolazione fluida tra le texture
                     vec4 tex1 = texture2D(uTexture1, vUv);
                     vec4 tex2 = texture2D(uTexture2, vUv);
                     vec4 finalColor = mix(tex1, tex2, smoothstep(0.0, 1.0, uProgress));
@@ -49,6 +49,7 @@ class VideoTransition {
             `
         });
 
+        // Configura il piano su cui renderizzare i video
         this.geometry = new THREE.PlaneGeometry(2, 2);
         this.mesh = new THREE.Mesh(this.geometry, this.material);
         this.scene.add(this.mesh);
@@ -75,41 +76,27 @@ class VideoTransition {
     initScrollEffect() {
         ScrollTrigger.create({
             trigger: "#content",
-            start: "top top", // Attiva lo scroll all'inizio della pagina
-            onEnter: () => this.startTransition(), // Avvia la transizione una volta che lo scroll è attivato
-            onLeaveBack: () => this.reverseTransition(), // Torna indietro se necessario
-            markers: true // Usa i marcatori per il debug
+            start: "top top", 
+            onEnter: () => this.startTransition(), 
+            onLeaveBack: () => this.reverseTransition(), 
+            markers: true // Usa marcatori per il debug
         });
     }
     
     startTransition() {
         gsap.to(this.material.uniforms.uProgress, {
             value: 1, // Completa la transizione verso il secondo video
-            duration: 0.8, // Durata ridotta per una transizione rapida
-            ease: "power2.inOut",
-            onComplete: () => {
-                this.hidePreviousVideo(); // Nascondere completamente il primo video
-            }
+            duration: 0.8, // Durata ridotta
+            ease: "power2.inOut"
         });
     }
-
+    
     reverseTransition() {
         gsap.to(this.material.uniforms.uProgress, {
             value: 0, // Torna indietro al primo video
-            duration: 0.8, // Durata ridotta per una transizione rapida
-            ease: "power2.inOut",
-            onComplete: () => {
-                this.showPreviousVideo(); // Ripristinare il primo video
-            }
+            duration: 0.8,
+            ease: "power2.inOut"
         });
-    }
-
-    hidePreviousVideo() {
-        this.videoTextures[0].image.style.display = 'none';
-    }
-
-    showPreviousVideo() {
-        this.videoTextures[0].image.style.display = 'block';
     }
 
     animate() {
@@ -118,5 +105,4 @@ class VideoTransition {
     }
 }
 
-// Inizializza la classe VideoTransition
 new VideoTransition('slider');
