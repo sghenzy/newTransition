@@ -24,8 +24,6 @@ class VideoTransition {
                 uTexture1: { value: this.videoTextures[0] },
                 uTexture2: { value: this.videoTextures[1] },
                 uProgress: { value: 0.0 },
-                uDistortion: { value: 0.15 }, // Valore di default per la distorsione
-                uRGBSplit: { value: 0.005 }, // Valore di default per RGB split
                 uResolution: { value: new THREE.Vector2(window.innerWidth, window.innerHeight) }
             },
             vertexShader: `
@@ -39,33 +37,21 @@ class VideoTransition {
                 uniform sampler2D uTexture1;
                 uniform sampler2D uTexture2;
                 uniform float uProgress;
-                uniform float uDistortion;
-                uniform float uRGBSplit;
                 varying vec2 vUv;
 
                 void main() {
-                    // Calcola la distorsione
-                    float distortionAmount = smoothstep(0.3, 0.7, uProgress) * uDistortion;
-                    vec2 distortedUv = vUv + vec2(distortionAmount * (1.0 - vUv.x), 0.0);
-
-                    // Effetto RGB Split: applicato solo durante la distorsione
-                    float rOffset = uRGBSplit * distortionAmount;
-                    float gOffset = uRGBSplit * distortionAmount * 1.5;
-                    float bOffset = uRGBSplit * distortionAmount * 2.0;
-
+                    // Elimina la distorsione e l'effetto RGB Split
                     vec4 tex1 = texture2D(uTexture1, vUv);
-                    vec4 tex2 = texture2D(uTexture2, distortedUv);
+                    vec4 tex2 = texture2D(uTexture2, vUv);
 
-                    vec4 color1 = texture2D(uTexture1, distortedUv - vec2(rOffset, 0.0));
-                    vec4 color2 = texture2D(uTexture2, distortedUv + vec2(gOffset, 0.0));
-                    vec4 color3 = texture2D(uTexture2, distortedUv - vec2(bOffset, 0.0));
-
-                    vec4 finalColor = mix(tex1, vec4(color1.r, color2.g, color3.b, 1.0), uProgress);
+                    // Mixa semplicemente i due video in base al progresso
+                    vec4 finalColor = mix(tex1, tex2, uProgress);
                     gl_FragColor = finalColor;
                 }
             `
         });
 
+        // Configura il piano su cui renderizzare i video
         this.geometry = new THREE.PlaneGeometry(2, 2);
         this.mesh = new THREE.Mesh(this.geometry, this.material);
         this.scene.add(this.mesh);
@@ -102,10 +88,10 @@ class VideoTransition {
     startTransition() {
         gsap.to(this.material.uniforms.uProgress, {
             value: 1, // Completa la transizione verso il secondo video
-            duration: 0.8, // Durata ridotta per una transizione più rapida
+            duration: 0.5, // Durata ridotta per una transizione rapida
             ease: "power2.inOut",
             onComplete: () => {
-                this.material.uniforms.uProgress.value = 1; // Assicura che il secondo video sia completamente visibile
+                this.material.uniforms.uTexture1.value.image.style.display = 'none'; // Nasconde il primo video
             }
         });
     }
@@ -113,10 +99,10 @@ class VideoTransition {
     reverseTransition() {
         gsap.to(this.material.uniforms.uProgress, {
             value: 0, // Torna indietro al primo video
-            duration: 0.8, // Durata ridotta per una transizione più rapida
+            duration: 0.5, // Durata ridotta per una transizione rapida
             ease: "power2.inOut",
             onComplete: () => {
-                this.material.uniforms.uProgress.value = 0; // Assicura che il primo video sia completamente visibile
+                this.material.uniforms.uTexture2.value.image.style.display = 'none'; // Nasconde il secondo video
             }
         });
     }
