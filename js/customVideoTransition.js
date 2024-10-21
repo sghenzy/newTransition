@@ -39,31 +39,29 @@ class VideoTransition {
                 uniform sampler2D uTexture1;
                 uniform sampler2D uTexture2;
                 uniform float uProgress;
-                uniform float uDistortion; // Nuovo uniform per controllare la distorsione
-                uniform float uRGBSplit; // Nuovo uniform per l'intensità dell'RGB split
                 varying vec2 vUv;
 
                 void main() {
-                    // Calcola la distorsione
-                    float distortionAmount = smoothstep(0.3, 0.7, uProgress) * uDistortion;
-                    vec2 distortedUv = vUv + vec2(distortionAmount * (1.0 - vUv.x), 0.0);
-
-                    // Applica l'RGB split solo durante la distorsione
-                    float rOffset = uRGBSplit * distortionAmount;
-                    float gOffset = uRGBSplit * distortionAmount * 1.5;
-                    float bOffset = uRGBSplit * distortionAmount * 2.0;
-
-                    vec4 tex1 = texture2D(uTexture1, distortedUv);
+                    // Distorsione attiva solo durante la transizione
+                    float distortionAmount = smoothstep(0.1, 0.9, uProgress) * 0.3; // Maggiore controllo sulla deformazione
+                    vec2 distortedUv = vUv + vec2(distortionAmount * (1.0 - vUv.x), 0.0); // Distorce verso il lato destro
+                    
+                    // Effetto RGB Split: solo quando c'è una distorsione
+                    float rOffset = 0.01 * distortionAmount; // Offset rosso
+                    float gOffset = 0.015 * distortionAmount; // Offset verde
+                    float bOffset = 0.02 * distortionAmount; // Offset blu
+                    
+                    vec4 tex1 = texture2D(uTexture1, vUv);
                     vec4 tex2 = texture2D(uTexture2, distortedUv);
-
+                    
                     vec4 color1 = texture2D(uTexture1, distortedUv - vec2(rOffset, 0.0));
                     vec4 color2 = texture2D(uTexture2, distortedUv + vec2(gOffset, 0.0));
                     vec4 color3 = texture2D(uTexture2, distortedUv - vec2(bOffset, 0.0));
-
-                    vec4 finalColor = mix(tex1, vec4(color1.r, color2.g, color3.b, 1.0), uProgress);
+                    
+                    // Mixa i canali solo dove c'è distorsione
+                    vec4 finalColor = mix(tex1, vec4(color1.r, color2.g, color3.b, 1.0), smoothstep(0.1, 0.9, uProgress));
                     gl_FragColor = finalColor;
                 }
-
             `
         });
 
@@ -95,7 +93,7 @@ class VideoTransition {
     initScrollEffect() {
         ScrollTrigger.create({
             trigger: "#content",
-            start: "top 50%", // Attiva lo scroll a metà della viewport
+            start: "top top", // Attiva lo scroll all'inizio della pagina
             onEnter: () => this.startTransition(), // Avvia la transizione una volta che lo scroll è attivato
             onLeaveBack: () => this.reverseTransition(), // Torna indietro se necessario
             markers: true // Usa i marcatori per il debug
@@ -105,7 +103,7 @@ class VideoTransition {
     startTransition() {
         gsap.to(this.material.uniforms.uProgress, {
             value: 1, // Completa la transizione verso il secondo video
-            duration: 0.8, // Durata più breve per una transizione rapida
+            duration: 1.5, // Durata dell'animazione
             ease: "power2.inOut"
         });
     }
@@ -113,42 +111,10 @@ class VideoTransition {
     reverseTransition() {
         gsap.to(this.material.uniforms.uProgress, {
             value: 0, // Torna indietro al primo video
-            duration: 0.8, // Durata più breve
+            duration: 1.5,
             ease: "power2.inOut"
         });
     }
-
-    setupTweakpane() {
-        try {
-            const pane = new Tweakpane(); // Verifica che Tweakpane sia stato caricato correttamente
-    
-            const folder = pane.addFolder({ title: "Video Transition Settings" });
-    
-            folder.addInput(this.material.uniforms.uDistortion, "value", {
-                min: 0,
-                max: 0.3,
-                step: 0.01,
-                label: "Distortion"
-            });
-    
-            folder.addInput(this.material.uniforms.uRGBSplit, "value", {
-                min: 0,
-                max: 0.05,
-                step: 0.001,
-                label: "RGB Split"
-            });
-    
-            folder.addInput(this.material.uniforms.uProgress, "value", {
-                min: 0,
-                max: 1,
-                step: 0.01,
-                label: "Progress"
-            });
-        } catch (error) {
-            console.error("Errore durante l'inizializzazione di Tweakpane:", error);
-        }
-    }
-    
 
     animate() {
         requestAnimationFrame(this.animate.bind(this));
