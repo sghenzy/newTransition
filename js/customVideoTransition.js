@@ -1,3 +1,5 @@
+import Tweakpane from 'https://cdn.jsdelivr.net/npm/tweakpane@4.0.4/dist/tweakpane.min.js';
+
 gsap.registerPlugin(ScrollTrigger);
 
 class VideoTransition {
@@ -88,7 +90,6 @@ class VideoTransition {
             };
         });
     }
-    
 
     initScrollEffect() {
         ScrollTrigger.create({
@@ -122,22 +123,26 @@ class VideoTransition {
     }
 
     setupTweakpane() {
-        const pane = new Tweakpane();
-        const folder = pane.addFolder({ title: "Video Transition Settings" });
-
-        folder.addInput(this.material.uniforms.uDistortion, "value", {
-            min: 0,
-            max: 0.3,
-            step: 0.01,
-            label: "Distortion"
-        });
-
-        folder.addInput(this.material.uniforms.uProgress, "value", {
-            min: 0,
-            max: 1,
-            step: 0.01,
-            label: "Progress"
-        });
+        try {
+            const pane = new Tweakpane.default ? new Tweakpane.default() : new Tweakpane();
+            const folder = pane.addFolder({ title: "Video Transition Settings" });
+    
+            folder.addInput(this.material.uniforms.uDistortion, "value", {
+                min: 0,
+                max: 0.3,
+                step: 0.01,
+                label: "Distortion"
+            });
+    
+            folder.addInput(this.material.uniforms.uProgress, "value", {
+                min: 0,
+                max: 1,
+                step: 0.01,
+                label: "Progress"
+            });
+        } catch (error) {
+            console.error("Errore durante l'inizializzazione di Tweakpane:", error);
+        }
     }
 }
 
