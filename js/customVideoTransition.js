@@ -23,7 +23,7 @@ class VideoTransition {
             uniforms: {
                 uTexture1: { value: this.videoTextures[0] },
                 uTexture2: { value: this.videoTextures[1] },
-                uProgress: { value: 0.0 },
+                uProgress: { value: 0.0 }, // Stato di interpolazione tra i video
                 uResolution: { value: new THREE.Vector2(window.innerWidth, window.innerHeight) }
             },
             vertexShader: `
@@ -40,18 +40,15 @@ class VideoTransition {
                 varying vec2 vUv;
 
                 void main() {
-                    // Elimina la distorsione e l'effetto RGB Split
+                    // Interpolazione tra due video
                     vec4 tex1 = texture2D(uTexture1, vUv);
                     vec4 tex2 = texture2D(uTexture2, vUv);
-
-                    // Mixa semplicemente i due video in base al progresso
-                    vec4 finalColor = mix(tex1, tex2, uProgress);
+                    vec4 finalColor = mix(tex1, tex2, smoothstep(0.0, 1.0, uProgress));
                     gl_FragColor = finalColor;
                 }
             `
         });
 
-        // Configura il piano su cui renderizzare i video
         this.geometry = new THREE.PlaneGeometry(2, 2);
         this.mesh = new THREE.Mesh(this.geometry, this.material);
         this.scene.add(this.mesh);
@@ -88,23 +85,31 @@ class VideoTransition {
     startTransition() {
         gsap.to(this.material.uniforms.uProgress, {
             value: 1, // Completa la transizione verso il secondo video
-            duration: 0.5, // Durata ridotta per una transizione rapida
+            duration: 0.8, // Durata ridotta per una transizione rapida
             ease: "power2.inOut",
             onComplete: () => {
-                this.material.uniforms.uTexture1.value.image.style.display = 'none'; // Nasconde il primo video
+                this.hidePreviousVideo(); // Nascondere completamente il primo video
             }
         });
     }
-    
+
     reverseTransition() {
         gsap.to(this.material.uniforms.uProgress, {
             value: 0, // Torna indietro al primo video
-            duration: 0.5, // Durata ridotta per una transizione rapida
+            duration: 0.8, // Durata ridotta per una transizione rapida
             ease: "power2.inOut",
             onComplete: () => {
-                this.material.uniforms.uTexture2.value.image.style.display = 'none'; // Nasconde il secondo video
+                this.showPreviousVideo(); // Ripristinare il primo video
             }
         });
+    }
+
+    hidePreviousVideo() {
+        this.videoTextures[0].image.style.display = 'none';
+    }
+
+    showPreviousVideo() {
+        this.videoTextures[0].image.style.display = 'block';
     }
 
     animate() {
