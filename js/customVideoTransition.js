@@ -117,25 +117,28 @@ class VideoTransition {
     }
 
     setupTweakpane() {
-        const pane = new Tweakpane();
-        const folder = pane.addFolder({ title: "Video Transition Settings" });
+        try {
+            const pane = new Tweakpane.default ? new Tweakpane.default() : new Tweakpane();
+            const folder = pane.addFolder({ title: "Video Transition Settings" });
     
-        // Slider per regolare l'intensità della distorsione durante la transizione
-        folder.addInput(this.material.uniforms.uDistortion, "value", {
-            min: 0,
-            max: 0.3,
-            step: 0.01,
-            label: "Distortion"
-        });
+            folder.addInput(this.material.uniforms.uDistortion, "value", {
+                min: 0,
+                max: 0.3,
+                step: 0.01,
+                label: "Distortion"
+            });
     
-        // Slider per controllare manualmente il progresso della transizione
-        folder.addInput(this.material.uniforms.uProgress, "value", {
-            min: 0,
-            max: 1,
-            step: 0.01,
-            label: "Progress"
-        });
+            folder.addInput(this.material.uniforms.uProgress, "value", {
+                min: 0,
+                max: 1,
+                step: 0.01,
+                label: "Progress"
+            });
+        } catch (error) {
+            console.error("Errore durante l'inizializzazione di Tweakpane:", error);
+        }
     }
+    
     
 }
 
