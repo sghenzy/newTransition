@@ -1,4 +1,5 @@
-import Tweakpane from 'https://cdn.jsdelivr.net/npm/tweakpane@4.0.4/dist/tweakpane.min.js';
+import * as Tweakpane from 'https://cdn.jsdelivr.net/npm/tweakpane@4.0.4/dist/tweakpane.min.js';
+
 
 gsap.registerPlugin(ScrollTrigger);
 
