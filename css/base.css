@@ -21,8 +21,9 @@ a:focus {
 #slider {
     width: 100vw;
     height: 100vh;
-    position: relative; /* Cambia per gestire meglio la posizione */
-    overflow: hidden;   /* Assicura che solo un video sia visibile */
+    display: flex;
+    justify-content: center;
+    align-items: center;
     z-index: 1;
 }
 
@@ -33,23 +34,12 @@ a:focus {
 }
 
 .video-container {
-    position: absolute; /* Mantiene il video fisso e sovrapposto */
+    position: fixed; /* Mantiene il video fisso */
     top: 0;
     left: 0;
     width: 100vw;
     height: 100vh;
     z-index: -1;
-    display: none;      /* Nasconde uno dei video per evitare che siano affiancati */
-}
-
-.video-container.active {
-    display: block;     /* Mostra solo il video attivo */
-}
-
-video {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;  /* Mantiene il rapporto d'aspetto del video e riempie l'intera area */
 }
 
 canvas {
