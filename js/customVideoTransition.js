@@ -14,6 +14,11 @@ class VideoTransition {
         this.renderer.setSize(window.innerWidth, window.innerHeight);
         this.container.appendChild(this.renderer.domElement);
 
+        // Configura EffectComposer per il post-processing
+        this.composer = new THREE.EffectComposer(this.renderer);
+        this.renderPass = new THREE.RenderPass(this.scene, this.camera);
+        this.composer.addPass(this.renderPass);
+
         // Caricamento dei video
         const videoPaths = JSON.parse(this.container.dataset.images);
         this.videoTextures = await Promise.all(videoPaths.map(this.loadVideoTexture));
@@ -24,7 +29,8 @@ class VideoTransition {
                 uTexture1: { value: this.videoTextures[0] },
                 uTexture2: { value: this.videoTextures[1] },
                 uProgress: { value: 0.0 }, // Valore di transizione
-                uResolution: { value: new THREE.Vector2(window.innerWidth, window.innerHeight) }
+                uResolution: { value: new THREE.Vector2(window.innerWidth, window.innerHeight) },
+                uDistortion: { value: 0.1 } // Parametro di distorsione controllabile
             },
             vertexShader: `
                 varying vec2 vUv;
@@ -37,11 +43,12 @@ class VideoTransition {
                 uniform sampler2D uTexture1;
                 uniform sampler2D uTexture2;
                 uniform float uProgress;
+                uniform float uDistortion;
                 varying vec2 vUv;
 
                 void main() {
-                    // Interpolazione fluida tra le texture
-                    vec4 tex1 = texture2D(uTexture1, vUv);
+                    vec2 uvDistort = vUv + sin(vUv.y * 10.0) * uDistortion * (1.0 - uProgress);
+                    vec4 tex1 = texture2D(uTexture1, uvDistort);
                     vec4 tex2 = texture2D(uTexture2, vUv);
                     vec4 finalColor = mix(tex1, tex2, smoothstep(0.0, 1.0, uProgress));
                     gl_FragColor = finalColor;
@@ -49,14 +56,19 @@ class VideoTransition {
             `
         });
 
-        // Configura il piano su cui renderizzare i video
         this.geometry = new THREE.PlaneGeometry(2, 2);
         this.mesh = new THREE.Mesh(this.geometry, this.material);
         this.scene.add(this.mesh);
 
         this.camera.position.z = 1;
+
+        // Aggiungi ShaderPass alla composizione
+        this.shaderPass = new THREE.ShaderPass(this.material);
+        this.composer.addPass(this.shaderPass);
+
         this.animate();
         this.initScrollEffect();
+        this.setupTweakpane();
     }
 
     loadVideoTexture(path) {
@@ -79,21 +91,21 @@ class VideoTransition {
             start: "top top", 
             onEnter: () => this.startTransition(), 
             onLeaveBack: () => this.reverseTransition(), 
-            markers: true // Usa marcatori per il debug
+            markers: true
         });
     }
     
     startTransition() {
         gsap.to(this.material.uniforms.uProgress, {
-            value: 1, // Completa la transizione verso il secondo video
-            duration: 0.8, // Durata ridotta
+            value: 1,
+            duration: 0.8,
             ease: "power2.inOut"
         });
     }
     
     reverseTransition() {
         gsap.to(this.material.uniforms.uProgress, {
-            value: 0, // Torna indietro al primo video
+            value: 0,
             duration: 0.8,
             ease: "power2.inOut"
         });
@@ -101,7 +113,26 @@ class VideoTransition {
 
     animate() {
         requestAnimationFrame(this.animate.bind(this));
-        this.renderer.render(this.scene, this.camera);
+        this.composer.render();
+    }
+
+    setupTweakpane() {
+        const pane = new Tweakpane();
+        const folder = pane.addFolder({ title: "Video Transition Settings" });
+
+        folder.addInput(this.material.uniforms.uDistortion, "value", {
+            min: 0,
+            max: 0.3,
+            step: 0.01,
+            label: "Distortion"
+        });
+
+        folder.addInput(this.material.uniforms.uProgress, "value", {
+            min: 0,
+            max: 1,
+            step: 0.01,
+            label: "Progress"
+        });
     }
 }
 
