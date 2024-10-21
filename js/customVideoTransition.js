@@ -75,20 +75,15 @@ class VideoTransition {
         return new Promise((resolve) => {
             const video = document.createElement('video');
             video.src = path;
-            video.crossOrigin = "anonymous"; // Aggiungi questo attributo
             video.loop = true;
             video.muted = true;
             video.play();
             video.onloadeddata = () => {
                 const texture = new THREE.VideoTexture(video);
-                texture.minFilter = THREE.LinearFilter;
-                texture.magFilter = THREE.LinearFilter;
-                texture.format = THREE.RGBFormat;
                 resolve(texture);
             };
         });
     }
-    
 
     initScrollEffect() {
         ScrollTrigger.create({
